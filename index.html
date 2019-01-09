@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>DAT 505 -SynthWavey Visualizer-Kamel Adjei</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+
+<body>
+ <!-- label to click-->
+  <label class="file" for="file">
+    CHOOSE AN MP3 FILE
+    <input id="audiofile" type="file" accept="audio/*" >
+  </label>
+
+ <!-- audio-->
+  <audio id="audio"  controls="controls"></audio>
+
+ <!-- div for canvas-->
+ <div id="canvas"></div>
+
+ <!-- container-->
+  <div id="container"></div>
+
+  <p>Press 1,2 or 3 to switch backgrounds or Press 4 to return</p>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/98/three.min.js'></script>
+  <script src='js/OBJLoader.js'></script>
+  <script src='js/MTLLoader.js'></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/WebGL.js"></script>
+  <script  src="js/index.js"></script>
+  <script src="js/pace.js"></script>
+
+
+  <script type="x-shader/x-vertex" id="vertexshader">
+
+  uniform float amplitude;
+  attribute float displacement;
+  varying vec3 vNormal;
+  varying vec2 vUv;
+
+  void main() {
+    vNormal = normal;
+    vUv = ( 0.5 + amplitude ) * uv + vec2( amplitude );
+    vec3 newPosition = position + amplitude * normal * vec3( displacement );
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+  }
+
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentshader">
+
+  varying vec3 vNormal;
+  varying vec2 vUv;
+  uniform vec3 color;
+  uniform sampler2D texture;
+
+  void main() {
+    vec3 light = vec3( 0.5, 0.2, 1.0 );
+    light = normalize( light );
+    float dProd = dot( vNormal, light ) * 0.5 + 0.5;
+    vec4 tcolor = texture2D( texture, vUv );
+    vec4 gray = vec4( vec3( tcolor.r * 0.3 + tcolor.g * 0.59 + tcolor.b * 0.11 ), 1.0 );
+    gl_FragColor = gray * vec4( vec3( dProd ) * vec3( color ), 1.0 );
+  }
+
+</script>
+</body>
+</html>
